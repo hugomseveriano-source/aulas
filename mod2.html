@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 2: Barreiras e Expulsão Silenciosa — Apresentação Narrada</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue-dark: #002f4b;
+            --blue-med: #005b96;
+            --blue-light: #e3f2fd;
+            --green-accent: #28a745;
+            --green-light: #d4edda;
+            --yellow-highlight: #ffc107;
+            --yellow-light: #fff9c4;
+            --white: #ffffff;
+            --text-main: #333333;
+            --text-light: #666666;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f2f5;
+            overflow: hidden;
+            color: var(--text-main);
+        }
+
+        /* --- Estrutura dos Slides --- */
+        .slider-container { width: 100vw; height: 100vh; position: relative; }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; visibility: hidden;
+            transition: all 0.7s ease-in-out;
+            display: flex;
+            padding: 40px 60px;
+            background: var(--white);
+            z-index: 1;
+        }
+
+        .slide.active { opacity: 1; visibility: visible; z-index: 2; }
+
+        /* --- Layouts Específicos --- */
+        
+        /* Layout Split (Imagem + Texto) */
+        .layout-split { display: flex; align-items: center; gap: 50px; height: 100%; }
+        .split-content { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: center; }
+        .split-image { 
+            flex: 1; height: 80%; border-radius: 20px; overflow: hidden; 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15); position: relative;
+        }
+        .split-image img { width: 100%; height: 100%; object-fit: cover; }
+        .img-overlay {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(to top, rgba(0,47,75,0.8), transparent);
+            padding: 20px; color: white; font-size: 0.9rem;
+        }
+
+        /* Layout Cards Grid */
+        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; width: 100%; margin-top: 30px; }
+        .card {
+            background: white; padding: 30px; border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--blue-med);
+            transition: transform 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); }
+        .card.green { border-color: var(--green-accent); }
+        .card.yellow { border-color: var(--yellow-highlight); }
+
+        /* Layout Timeline Horizontal */
+        .timeline-container {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            width: 100%; margin-top: 60px; position: relative;
+        }
+        .timeline-line {
+            position: absolute; top: 40px; left: 0; width: 100%; height: 4px;
+            background: #ddd; z-index: 0;
+        }
+        .t-item {
+            position: relative; z-index: 1; width: 30%; text-align: center;
+            background: white; padding: 20px; border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .t-icon {
+            width: 80px; height: 80px; background: var(--blue-light);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 15px; font-size: 2rem; color: var(--blue-dark);
+        }
+
+        /* --- Tipografia --- */
+        h1 { font-size: 3.5rem; color: var(--blue-dark); line-height: 1.2; margin-bottom: 20px; }
+        h2 { font-size: 2.2rem; color: var(--blue-med); margin-bottom: 25px; border-left: 6px solid var(--yellow-highlight); padding-left: 20px; }
+        h3 { font-size: 1.4rem; color: var(--blue-dark); margin-bottom: 10px; }
+        p { font-size: 1.1rem; line-height: 1.7; color: var(--text-light); margin-bottom: 15px; }
+        
+        .highlight-box {
+            background: var(--blue-light); padding: 20px; border-radius: 10px;
+            border-left: 4px solid var(--blue-dark); margin: 20px 0;
+        }
+        .quote { font-style: italic; color: var(--blue-dark); font-weight: 600; }
+
+        /* --- Elementos Decorativos --- */
+        .bg-shape {
+            position: absolute; border-radius: 50%; opacity: 0.05; z-index: 0; pointer-events: none;
+        }
+        .shape-1 { width: 400px; height: 400px; background: var(--blue-med); top: -100px; right: -100px; }
+        .shape-2 { width: 300px; height: 300px; background: var(--green-accent); bottom: -50px; left: -50px; }
+
+        /* --- Controles --- */
+        .controls { position: absolute; bottom: 30px; right: 40px; display: flex; gap: 15px; z-index: 100; }
+        .btn-nav {
+            background: var(--blue-dark); color: white; border: none;
+            width: 50px; height: 50px; border-radius: 50%; cursor: pointer;
+            font-size: 1.2rem; transition: all 0.3s; display: flex; align-items: center; justify-content: center;
+        }
+        .btn-nav:hover { background: var(--green-accent); transform: scale(1.1); }
+        
+        .progress-bar { position: absolute; top: 0; left: 0; height: 6px; background: var(--yellow-highlight); width: 0%; transition: width 0.5s; z-index: 100; }
+        .slide-counter { position: absolute; bottom: 35px; left: 40px; font-size: 0.9rem; color: var(--text-light); z-index: 100; }
+
+        /* --- Animações --- */
+        .anim-fade { opacity: 0; transform: translateY(20px); transition: all 0.8s ease; }
+        .slide.active .anim-fade { opacity: 1; transform: translateY(0); }
+        .delay-1 { transition-delay: 0.2s; }
+        .delay-2 { transition-delay: 0.4s; }
+        .delay-3 { transition-delay: 0.6s; }
+
+        /* Slide Capa Especial */
+        .slide-cover { background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-med) 100%); color: white; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .slide-cover h1 { color: white; font-size: 4rem; }
+        .slide-cover p { color: rgba(255,255,255,0.9); font-size: 1.4rem; max-width: 800px; }
+        .badge { background: var(--yellow-highlight); color: var(--blue-dark); padding: 8px 20px; border-radius: 30px; font-weight: bold; margin-bottom: 20px; display: inline-block; }
+
+        /* Barra de Acessibilidade (Estilo Módulo 1) */
+        .a11y-bar {
+            position: absolute; top: 20px; right: 40px; z-index: 100;
+            display: flex; gap: 10px;
+        }
+        .a11y-btn {
+            background: rgba(255,255,255,0.9); border: 1px solid #ccc;
+            padding: 5px 10px; border-radius: 5px; cursor: pointer;
+            font-size: 0.8rem; font-weight: bold; color: var(--blue-dark);
+        }
+        .a11y-btn:hover { background: var(--yellow-highlight); }
+
+        /* Alto Contraste */
+        body.high-contrast { background: #000; color: #fff; }
+        body.high-contrast .slide { background: #000; color: #fff; }
+        body.high-contrast h1, body.high-contrast h2, body.high-contrast h3, body.high-contrast strong { color: #ffff00; }
+        body.high-contrast p, body.high-contrast li { color: #fff; }
+        body.high-contrast .card, body.high-contrast .highlight-box, body.high-contrast .t-item { background: #000; border-color: #ffff00; color: #fff; }
+        body.high-contrast .quote { color: #ffff00; }
+        body.high-contrast .btn-nav { background: #ffff00; color: #000; }
+        body.high-contrast .slide-cover { background: #000; border: 2px solid #ffff00; }
+        body.high-contrast .badge { background: #ffff00; color: #000; }
+        body.high-contrast .img-overlay { background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); }
+        body.high-contrast .a11y-btn { background: #000; color: #ffff00; border-color: #ffff00; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Barra de Acessibilidade Simples (Estilo Mod 1) -->
+    <div class="a11y-bar">
+        <button class="a11y-btn" onclick="changeFont(-1)">A-</button>
+        <button class="a11y-btn" onclick="changeFont(1)">A+</button>
+        <button class="a11y-btn" onclick="toggleContrast()">◐ Alto Contraste</button>
+        <button class="a11y-btn" onclick="toggleImages()">🚫 Imagens</button>
+    </div>
+
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="slide-counter" id="slideCounter">Slide 1 de 8</div>
+
+    <div class="slider-container">
+
+        <!-- SLIDE 1: CAPA -->
+        <div class="slide slide-cover active">
+            <div class="bg-shape shape-1" style="background: rgba(255,255,255,0.1);"></div>
+            <span class="badge anim-fade">Módulo 2 — Caminhos da Inclusão</span>
+            <h1 class="anim-fade delay-1">O Ciclo da Exclusão:<br>Barreiras, Evasão e Idade</h1>
+            <p class="anim-fade delay-2">Barreiras de Acessibilidade e a "Expulsão" Silenciosa na EJA e EPT</p>
+            <div style="margin-top: 40px; font-size: 0.9rem; opacity: 0.7;" class="anim-fade delay-3">
+                Instrutor: Hugo Severiano | Duração: 2h00min<br>Use as setas do teclado ← → para navegar.
+            </div>
+        </div>
+
+        <!-- SLIDE 2: EXPULSÃO SILENCIOSA -->
+        <div class="slide">
+            <div class="layout-split">
+                <div class="split-content anim-fade">
+                    <h2>A "Expulsão" Silenciosa</h2>
+                    <p>Diferente de uma expulsão disciplinar formal, a <strong>"expulsão silenciosa"</strong> acontece de forma sutil, cotidiana e acumulativa, até que o estudante simplesmente deixa de frequentar a escola.</p>
+                    
+                    <div class="highlight-box">
+                        <p class="quote">"A evasão escolar na intersecção entre EJA, EPT e Educação Especial raramente é uma escolha livre. Ela é o resultado direto de um ambiente que não foi desenhado para acolher aquele corpo, aquela mente e aquela trajetória de vida."</p>
+                    </div>
+
+                    <p>Nesta aula, vamos sair dos textos legais e entrar na realidade concreta das nossas escolas para entender como esse ciclo se forma.</p>
+                </div>
+                <div class="split-image anim-fade delay-2">
+                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80" alt="Estudante adulto concentrado em leitura e anotações complexas em biblioteca">
+                    <div class="img-overlay">O estudante adulto busca reconhecimento de sua capacidade intelectual.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: AS 6 BARREIRAS DA LBI -->
+        <div class="slide">
+            <div style="width: 100%;">
+                <h2 class="anim-fade">As 6 Barreiras da LBI (Art. 3º, IV)</h2>
+                <p class="anim-fade delay-1">A Lei Brasileira de Inclusão define seis tipos de barreiras como <strong>ferramentas de diagnóstico</strong> para nossa prática:</p>
+                
+                <div class="grid-container anim-fade delay-2">
+                    <div class="card">
+                        <h3>🏗️ Urbanísticas/Arquitetônicas</h3>
+                        <p>Impedem o acesso físico aos espaços escolares.</p>
+                    </div>
+                    <div class="card">
+                        <h3>🚌 Nos Transportes</h3>
+                        <p>Dificultam ou impossibilitam o deslocamento até a escola.</p>
+                    </div>
+                    <div class="card green">
+                        <h3>💬 Comunicações</h3>
+                        <p>Bloqueiam o acesso ao conteúdo pedagógico.</p>
+                    </div>
+                    <div class="card green">
+                        <h3>💻 Tecnológicas</h3>
+                        <p>Excluem quem não tem acesso ou habilidade com recursos digitais.</p>
+                    </div>
+                    <div class="card yellow">
+                        <h3>🧠 Atitudinais</h3>
+                        <p>Residem nos preconceitos, estigmas e estereótipos. <strong>São as mais difíceis de combater.</strong></p>
+                    </div>
+                </div>
+                <p class="anim-fade delay-3" style="margin-top: 20px;"><strong>Na EPT:</strong> uma oficina sem adaptação não é só barreira arquitetônica — é barreira curricular que diz ao estudante que aquele saber técnico não é para ele.</p>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: BARREIRAS NA EPT -->
+        <div class="slide">
+            <div class="layout-split" style="flex-direction: row-reverse;">
+                <div class="split-content anim-fade">
+                    <h2>EPT: Espaços de Exclusão Técnica</h2>
+                    <p>Os espaços de formação profissional — oficinas, laboratórios, cozinhas experimentais — foram historicamente projetados para um padrão normativo. O que o estudante encontra?</p>
+                    
+                    <ul style="list-style: none; margin-top: 20px;">
+                        <li style="margin-bottom: 15px; display: flex; align-items: start;">
+                            <span style="color: var(--green-accent); margin-right: 10px; font-size: 1.2rem;">✓</span>
+                            <div>Bancadas com altura fixa e máquinas sem proteções adaptadas</div>
+                        </li>
+                        <li style="margin-bottom: 15px; display: flex; align-items: start;">
+                            <span style="color: var(--green-accent); margin-right: 10px; font-size: 1.2rem;">✓</span>
+                            <div>Sinalizações puramente visuais ou sonoras</div>
+                        </li>
+                        <li style="margin-bottom: 15px; display: flex; align-items: start;">
+                            <span style="color: var(--green-accent); margin-right: 10px; font-size: 1.2rem;">✓</span>
+                            <div>Protocolos de segurança que ignoram diferentes processamentos sensoriais</div>
+                        </li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <p><strong>Ponto crucial:</strong> a falta de adaptação na EPT é <strong>planejamento pedagógico</strong>. Se o currículo não prevê flexibilidade desde o início, ele já nasce excludente.</p>
+                    </div>
+                </div>
+                <div class="split-image anim-fade delay-1">
+                    <img src="https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=800&q=80" alt="Profissional com deficiência utilizando tecnologia assistiva em ambiente técnico">
+                    <div class="img-overlay">Inclusão na EPT exige adaptação instrumental e pedagógica prévia.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: INFANTILIZAÇÃO NA EJA -->
+        <div class="slide">
+            <div class="layout-split">
+                <div class="split-content anim-fade">
+                    <h2>Infantilização: Barreira Atitudinal Disfarçada</h2>
+                    <p>Uma barreira devastadora na EJA não nomeada na LBI: a <strong>metodologia infantilizada</strong>.</p>
+                    
+                    <div class="grid-container" style="grid-template-columns: 1fr; margin-top: 20px;">
+                        <div class="card yellow">
+                            <h3>❌ Desrespeito à Adultez</h3>
+                            <p>Materiais com linguagem infantil desrespeitam a condição de sujeito adulto, com história e responsabilidades próprias.</p>
+                        </div>
+                        <div class="card yellow">
+                            <h3>❌ Reforço de Estigma</h3>
+                            <p>Reforça a ideia de "eterna criança", incapaz de aprender conteúdos complexos ou exercer autonomia.</p>
+                        </div>
+                    </div>
+
+                    <div class="highlight-box" style="margin-top: 20px;">
+                        <p class="quote">"O estudante adulto percebe quando está sendo tratado como criança. Ele sente o desrespeito e vai embora. Não porque não quer aprender, mas porque a escola não reconhece quem ele é."</p>
+                    </div>
+                </div>
+                <div class="split-image anim-fade delay-2">
+                    <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80" alt="Estudante adulto mais velho participando ativamente de aula técnica">
+                    <div class="img-overlay">Respeito à adultez é pré-requisito para aprendizagem na EJA.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: DISTORÇÃO IDADE-ETAPA -->
+        <div class="slide">
+            <div class="layout-split" style="flex-direction: row-reverse;">
+                <div class="split-content anim-fade">
+                    <h2>Distorção Idade-Etapa: Ferida Identitária</h2>
+                    <p>Estudantes com deficiência frequentemente ingressam na EJA com idades muito superiores às esperadas. Na vida real:</p>
+                    
+                    <ul style="list-style: none; margin-top: 20px;">
+                        <li style="margin-bottom: 15px; padding-left: 20px; border-left: 3px solid var(--yellow-highlight);">
+                            Conviver diariamente com colegas significativamente mais jovens
+                        </li>
+                        <li style="margin-bottom: 15px; padding-left: 20px; border-left: 3px solid var(--yellow-highlight);">
+                            Carregar o peso de histórico marcado por repetências e fracassos institucionais
+                        </li>
+                        <li style="margin-bottom: 15px; padding-left: 20px; border-left: 3px solid var(--yellow-highlight);">
+                            Enfrentar o julgamento social de estar "atrasado"
+                        </li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <p>Para o público da Educação Especial, essa distorção é uma <strong>ferida identitária aberta</strong>. Gera vergonha, baixa autoestima e ansiedade.</p>
+                    </div>
+                    <p><strong>A evasão pode ser mecanismo de autopreservação.</strong> O estudante sai porque permanecer dói demais.</p>
+                </div>
+                <div class="split-image anim-fade delay-1">
+                    <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80" alt="Sala de aula vazia com carteira isolada simbolizando evasão">
+                    <div class="img-overlay">A evasão raramente é escolha livre; é resultado de ambiente excludente.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: CICLO DA EXCLUSÃO -->
+        <div class="slide">
+            <div style="width: 100%; max-width: 1000px; margin: 0 auto;">
+                <h2 class="anim-fade" style="text-align: center; border: none; margin-bottom: 40px;">O Ciclo da Exclusão</h2>
+                
+                <div class="timeline-container anim-fade delay-1">
+                    <div class="timeline-line"></div>
+                    
+                    <div class="t-item">
+                        <div class="t-icon">🚧</div>
+                        <h4>1. Barreira Física/Comunicacional</h4>
+                        <p style="font-size: 0.9rem; margin-top: 10px;">Dificulta o aprendizado e participação plena.</p>
+                    </div>
+
+                    <div class="t-item" style="transform: scale(1.05); border: 2px solid var(--blue-med);">
+                        <div class="t-icon" style="background: var(--blue-med); color: white;">😔</div>
+                        <h4>2. Sofrimento Psíquico</h4>
+                        <p style="font-size: 0.9rem; margin-top: 10px;">Aumenta distorção idade-etapa e ferida identitária.</p>
+                    </div>
+
+                    <div class="t-item" style="border-color: var(--yellow-highlight);">
+                        <div class="t-icon" style="background: var(--yellow-light); color: var(--blue-dark);">🚪</div>
+                        <h4>3. EVASÃO</h4>
+                        <p style="font-size: 0.9rem; margin-top: 10px;">A "expulsão silenciosa" como autopreservação.</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box anim-fade delay-2" style="margin-top: 40px; text-align: center;">
+                    <p><strong>Romper esse ciclo exige:</strong> acessibilidade física + adaptação curricular + respeito à adultez + acolhimento psicossocial.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: ATIVIDADE PRÁTICA -->
+        <div class="slide">
+            <div class="layout-split">
+                <div class="split-content anim-fade">
+                    <h2>Atividade: Estudo de Caso "João"</h2>
+                    
+                    <div class="card" style="margin-bottom: 20px;">
+                        <h3>👤 O Caso</h3>
+                        <p><strong>João</strong>, 28 anos, TEA nível 1, 3º ano Técnico em Informática (EJA). Abandonou após 6 meses.</p>
+                    </div>
+
+                    <div class="card green" style="margin-bottom: 20px;">
+                        <h3>📋 Sua Tarefa</h3>
+                        <p>Redigir <strong>"Laudo de Barreiras"</strong> (pedagógico-institucional):</p>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Categorizar barreiras pela LBI</li>
+                            <li>Apontar ≥ 3 barreiras específicas</li>
+                            <li>Justificar com trechos do caso</li>
+                        </ul>
+                    </div>
+
+                    <div class="card yellow">
+                        <h3>📅 Entrega</h3>
+                        <p><strong>Formato:</strong> 2-3 páginas<br><strong>Onde:</strong> Google Drive (Módulo 2)<br><strong>Peso:</strong> 30% da avaliação</p>
+                    </div>
+                </div>
+                <div class="split-image anim-fade delay-2">
+                    <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80" alt="Caderno aberto com anotações sobre mesa de estudo">
+                    <div class="img-overlay">Elabore um laudo pedagógico-institucional, NÃO clínico.</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Controles -->
+    <div class="controls">
+        <button class="btn-nav" onclick="changeSlide(-1)" aria-label="Slide anterior">&#8592;</button>
+        <button class="btn-nav" onclick="changeSlide(1)" aria-label="Próximo slide">&#8594;</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const progressBar = document.getElementById('progressBar');
+        const slideCounter = document.getElementById('slideCounter');
+        let fontSize = 100;
+
+        function updateUI() {
+            const progress = ((currentSlide + 1) / slides.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            slideCounter.textContent = `Slide ${currentSlide + 1} de ${slides.length}`;
+        }
+
+        function changeSlide(direction) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            slides[currentSlide].classList.add('active');
+            updateUI();
+        }
+
+        // Teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); changeSlide(1); }
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+        });
+
+        // Acessibilidade
+        function changeFont(delta) {
+            fontSize = Math.min(150, Math.max(80, fontSize + delta * 10));
+            document.body.style.fontSize = `${fontSize}%`;
+        }
+
+        function toggleContrast() {
+            document.body.classList.toggle('high-contrast');
+        }
+
+        function toggleImages() {
+            const imgs = document.querySelectorAll('.split-image');
+            imgs.forEach(img => {
+                img.style.display = img.style.display === 'none' ? 'block' : 'none';
+            });
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
